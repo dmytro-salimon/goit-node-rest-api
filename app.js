@@ -3,8 +3,6 @@ import morgan from "morgan";
 import cors from "cors";
 import "dotenv/config.js";
 
-import sequelize from "./db/Sequelize.js";
-
 import contactsRouter from "./routes/contactsRouter.js";
 
 const app = express();
