@@ -1,48 +1,33 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import { nanoid } from "nanoid";
+import User from "../db/models/Contact.js";
 
-const contactsPath = path.resolve("db", "contacts.json");
+export const listContacts = () => User.findAll();
 
-const updateContacts = (contacts) =>
-  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+export const getContactById = (id) => User.findByPk(id);
 
-export const listContacts = async () => {
-  const data = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
-};
-
-export const getContactById = async (id) => {
-  const contacts = await listContacts();
-  const contact = contacts.find((item) => item.id === id);
-  return contact || null;
-};
-
-export const addContactById = async (data) => {
-  const contacts = await listContacts();
-  const newContact = { id: nanoid(), ...data };
-  contacts.push(newContact);
-
-  await updateContacts(contacts);
-  return newContact;
-};
+export const addContactById = (data) => User.create(data);
 
 export const removeContactById = async (id) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((item) => item.id === id);
-  if (index === -1) return null;
-  const [result] = contacts.splice(index, 1);
+  const contact = await getContactById(id);
+  if (!contact) return null;
 
-  await updateContacts(contacts);
-  return result;
+  await contact.destroy();
+  return contact;
 };
 
 export const updateContactById = async (id, data) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((item) => item.id === id);
-  if (index === -1) return null;
-  contacts[index] = { ...contacts[index], ...data };
+  const contact = await getContactById(id);
+  if (!contact) return null;
 
-  await updateContacts(contacts);
-  return contacts[index];
+  return contact.update(data, {
+    returning: true,
+  });
+};
+
+export const updateStatusContact = async (contactId, data) => {
+  const contact = await getContactById(contactId);
+  if (!contact) return null;
+
+  return contact.update(data, {
+    returning: true,
+  });
 };

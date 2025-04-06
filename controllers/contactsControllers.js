@@ -46,10 +46,29 @@ const updateContactController = async (req, res) => {
   res.status(200).json(contact);
 };
 
+const updateFavoriteController = async (req, res) => {
+  const { contactId } = req.params;
+  const { favorite } = req.body;
+
+  if (!favorite) {
+    throw HttpError(400, "missing field favorite");
+  }
+
+  const contact = await contactsService.updateContactById(contactId, {
+    favorite,
+  });
+
+  if (!contact) {
+    throw HttpError(404, `Contact with id ${contactId} not found`);
+  }
+  res.status(200).json(contact);
+};
+
 export default {
   getContactsController: ctrlWrapper(getContactsController),
   getOneContactController: ctrlWrapper(getOneContactController),
   deleteContactController: ctrlWrapper(deleteContactController),
   createContactController: ctrlWrapper(createContactController),
   updateContactController: ctrlWrapper(updateContactController),
+  updateFavoriteController: ctrlWrapper(updateFavoriteController),
 };
