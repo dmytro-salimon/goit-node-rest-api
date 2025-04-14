@@ -1,10 +1,10 @@
-import User from "../db/models/Contact.js";
+import Contact from "../db/models/Contact.js";
 
-export const listContacts = () => User.findAll();
+export const listContacts = () => Contact.findAll();
 
-export const getContactById = (id) => User.findByPk(id);
+export const getContactById = (id) => Contact.findByPk(id);
 
-export const addContactById = (data) => User.create(data);
+export const addContactById = (data) => Contact.create(data);
 
 export const removeContactById = async (id) => {
   const contact = await getContactById(id);
