@@ -14,7 +14,7 @@ export const getContact = (query) =>
 
 export const addContactById = (data) => Contact.create(data);
 
-export const removeContactById = async (query) => {
+export const removeContact = async (query) => {
   const contact = await getContact(query);
   if (!contact) return null;
 
