@@ -1,7 +1,5 @@
 import * as authService from "../services/authServices.js";
-import HttpError from "../helpers/HttpError.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
-import { json } from "sequelize";
 
 const registerController = async (req, res) => {
   const newUser = await authService.registerUser(req.body);
@@ -21,7 +19,25 @@ const loginController = async (req, res) => {
   });
 };
 
+const getCurrentController = async (req, res) => {
+  const { email, subscription } = req.user;
+  res.status(200).json({
+    email,
+    subscription,
+  });
+};
+
+const logoutController = async (req, res) => {
+  const { id } = req.user;
+  await authService.logoutUser(id);
+  res.json({
+    message: "Logout success",
+  });
+};
+
 export default {
   register: ctrlWrapper(registerController),
   login: ctrlWrapper(loginController),
+  getCurrentController: ctrlWrapper(getCurrentController),
+  logoutController: ctrlWrapper(logoutController),
 };
