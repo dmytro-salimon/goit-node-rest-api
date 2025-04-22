@@ -1,6 +1,10 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import * as contactsService from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
+
+const avatarsDir = path.resolve("public", "avatars");
 
 const getContactsController = async (req, res) => {
   const { id: owner } = req.user;
@@ -32,8 +36,19 @@ const deleteContactController = async (req, res) => {
 };
 
 const createContactController = async (req, res) => {
+  let avatar = null;
+  if (req.file) {
+    const { path: tempPath, filename } = req.file;
+    const newPath = path.join(avatarsDir, filename);
+    await fs.rename(tempPath, newPath);
+    avatar = path.join("avatars", filename);
+  }
   const { id: owner } = req.user;
-  const data = await contactsService.addContactById({ ...req.body, owner });
+  const data = await contactsService.addContactById({
+    ...req.body,
+    avatar,
+    owner,
+  });
   res.status(201).json(data);
 };
 
@@ -57,9 +72,10 @@ const updateFavoriteController = async (req, res) => {
     throw HttpError(400, "missing field favorite");
   }
 
-  const contact = await contactsService.updateContactById(contactId, owner, {
-    favorite,
-  });
+  const contact = await contactsService.updateContact(
+    { id: contactId, owner },
+    { favorite }
+  );
 
   if (!contact) {
     throw HttpError(404, `Contact with id ${contactId} not found`);

@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import gravatar from "gravatar";
 import User from "../db/models/User.js";
 import HttpError from "../helpers/HttpError.js";
 import { generateToken } from "../helpers/jwt.js";
@@ -22,7 +23,9 @@ export const registerUser = async (data) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  return await User.create({ ...data, password: hashedPassword });
+  const avatarURL = gravatar.url(email, { s: "200", r: "pg", d: "mm" }, true);
+
+  return await User.create({ ...data, password: hashedPassword, avatarURL });
 };
 
 export const loginUser = async (data) => {
@@ -52,6 +55,7 @@ export const loginUser = async (data) => {
 
   return {
     token,
+    user,
   };
 };
 
@@ -61,4 +65,12 @@ export const logoutUser = async (id) => {
     throw HttpError(401, "Not authorized");
   }
   await user.update({ token: null });
+};
+
+export const updateAvatar = async (id, avatarURL) => {
+  const user = await User.findByPk(id);
+  if (!user) {
+    throw HttpError(401, "Not authorized");
+  }
+  await user.update({ avatarURL });
 };

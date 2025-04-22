@@ -11,6 +11,7 @@ const app = express();
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactsRouter);
@@ -28,5 +29,5 @@ const { PORT = 3000 } = process.env;
 const port = Number(PORT);
 
 app.listen(port, () => {
-  console.log("Server is running. Use our API on port: ${port}");
+  console.log(`Server is running. Use our API on port: ${port}`);
 });
