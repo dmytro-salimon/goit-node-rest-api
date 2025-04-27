@@ -20,6 +20,14 @@ const User = sequelize.define("User", {
     values: ["starter", "pro", "business"],
     defaultValue: "starter",
   },
+  verify: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  verificationCode: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   token: {
     type: DataTypes.STRING,
     defaultValue: null,

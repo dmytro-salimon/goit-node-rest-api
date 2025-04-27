@@ -16,6 +16,24 @@ const registerController = async (req, res) => {
   });
 };
 
+const verifyController = async (req, res) => {
+  const { verificationCode } = req.params;
+  await authService.verifyUser(verificationCode);
+
+  res.json({
+    message: "Verification successful",
+  });
+};
+
+const resendVerifyController = async (req, res) => {
+  const { email } = req.body;
+  await authService.resendVerifyEmail(email);
+
+  res.json({
+    message: "Verification email sent",
+  });
+};
+
 const loginController = async (req, res) => {
   const { token, user } = await authService.loginUser(req.body);
   res.json({
@@ -45,6 +63,10 @@ const logoutController = async (req, res) => {
 
 const updateAvatarController = async (req, res) => {
   const { id } = req.user;
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
   const { path: tempPath, filename } = req.file;
   const newPath = path.join(avatarsDir, filename);
   await fs.rename(tempPath, newPath);
@@ -57,6 +79,8 @@ const updateAvatarController = async (req, res) => {
 
 export default {
   register: ctrlWrapper(registerController),
+  verifyController: ctrlWrapper(verifyController),
+  resendVerifyController: ctrlWrapper(resendVerifyController),
   login: ctrlWrapper(loginController),
   getCurrentController: ctrlWrapper(getCurrentController),
   logoutController: ctrlWrapper(logoutController),
